@@ -15,11 +15,37 @@ glm::mat4  matP;//rzutowania
 glm::mat4  matV;//widoku
 glm::mat4  matM;//modelu
 
+
+
+// k¹t horyzontalny (na -Z)
+float horizontalAngle = 3.14f;
+//k¹t horyzontalny (na horyzont)
+float verticalAngle = 0.0f;
+//prêdkoœæ ruchu kamery
+float speed = 0.1f;
+//prêdkoœæ obracania kamery
+float mouseSpeed = 0.00005f;
+int mxpos, mypos;
+POINT pt;
+// wektory pozycji, do góry, i w prawo
+glm::vec3 position = glm::vec3(0, 0, 5);
+glm::vec3 direction(
+	cos(verticalAngle) * sin(horizontalAngle),
+	sin(verticalAngle),
+	cos(verticalAngle) * cos(horizontalAngle)
+	);
+
+glm::vec3 right = glm::vec3(
+	sin(horizontalAngle - 3.14f / 2.0f),
+	0,
+	cos(horizontalAngle - 3.14f / 2.0f)
+	);
+
 //Ustawienia okna i rzutowania
 int windowPositionX=100;
 int windowPositionY=100;
-int windowWidth=400;
-int windowHeight=400;
+int windowWidth=900;
+int windowHeight=600;
 float cameraAngle=45.0f;
 
 //Zmienne do animacji
@@ -103,15 +129,29 @@ void drawObject() {
 
 //Procedura rysuj¹ca
 void displayFrame() {
+
 	//Wyczyœæ bufor kolorów i bufor g³êbokoœci
 	glClearColor(0,0,0,1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	//obliczenie kierunku "patrzenia"
+	glm::vec3 direction(
+		cos(verticalAngle) * sin(horizontalAngle),
+		sin(verticalAngle),
+		cos(verticalAngle) * cos(horizontalAngle)
+		);
+
+	glm::vec3 right = glm::vec3(
+		sin(horizontalAngle - 3.14f / 2.0f),
+		0,
+		cos(horizontalAngle - 3.14f / 2.0f)
+		);
+	glm::vec3 up = glm::cross(right, direction);
 	//Wylicz macierz rzutowania
 	matP=glm::perspective(cameraAngle, (float)windowWidth/(float)windowHeight, 1.0f, 100.0f);
 	
 	//Wylicz macierz widoku
-	matV=glm::lookAt(glm::vec3(0.0f,0.0f,4.0f),glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.0f,1.0f,0.0f)); 
+	matV=glm::lookAt(position,position+direction,up); 
 
 	//Wylicz macierz modelu
 	matM=glm::rotate(glm::mat4(1.0f),angle_x,glm::vec3(1,0,0)); 
@@ -176,6 +216,13 @@ void nextFrame(void) {
 	if (angle_y>360) angle_y-=360;
 	if (angle_x<0) angle_x+=360;
 	if (angle_y<0) angle_y+=360;
+	//resetowanie pozycji myszy zeby nie wyjechala
+	GetCursorPos(&pt);
+	mxpos = pt.x-windowPositionX;
+	mypos = pt.y-windowPositionY;
+	SetCursorPos(windowWidth / 2 + windowPositionX, windowHeight / 2 + windowPositionY);
+	horizontalAngle += mouseSpeed  *interval* float(windowWidth / 2 - mxpos);
+	verticalAngle += mouseSpeed  *interval * float(windowHeight / 2 - mypos);
 	glutPostRedisplay();
 }
 
@@ -193,6 +240,8 @@ void keyDown(int c, int x, int y) {
 	case GLUT_KEY_DOWN:
 		speed_x=120;
 		break;
+	case GLUT_KEY_END: //end koñczy
+		exit(EXIT_SUCCESS);
 	}
 }
 
@@ -213,6 +262,51 @@ void keyUp(int c, int x, int y) {
 	}
 }
 
+void moveMouse(int x, int y)
+{
+
+}
+
+void keyUnpressed(unsigned char key, int x, int y)
+{
+}
+void keyPressed(unsigned char key, int x, int y){
+	// nie mam pojecia dlaczego, ale globalnie nie dziala wiec tutaj obliczam nowe wektory
+	glm::vec3 direction(
+		cos(verticalAngle) * sin(horizontalAngle),
+		0,
+		cos(verticalAngle) * cos(horizontalAngle)
+		);
+	// zamieniæ je¿eli chcesz mieæ woln¹ kamerê ( do góry i w dó³ te¿ mozna sie poruszaæ)
+	/*glm::vec3 direction(
+		cos(verticalAngle) * sin(horizontalAngle),
+		sin(verticalAngle),
+		cos(verticalAngle) * cos(horizontalAngle)
+		);*/
+
+	glm::vec3 right = glm::vec3(
+		sin(horizontalAngle - 3.14f / 2.0f),
+		0,
+		cos(horizontalAngle - 3.14f / 2.0f)
+		);
+
+	if (key == 'w')
+	{
+		position += direction * speed;
+	};//ruch do przodu
+	if (key == 's')
+	{
+		position -= direction * speed;
+	};//ruch do tylu
+	if (key == 'a')
+	{
+		position -= right * speed;
+	}
+	if (key == 'd')
+	{
+		position += right * speed;
+	}
+}
 
 //Procedura wywo³ywana przy zmianie rozmiaru okna
 void changeSize(int w, int h) {
@@ -238,6 +332,13 @@ void initGLUT(int *argc, char** argv) {
 
 	glutSpecialFunc(keyDown);
 	glutSpecialUpFunc(keyUp);
+
+	glutKeyboardFunc(keyPressed);
+	glutKeyboardUpFunc(keyUnpressed);
+
+	//do myszki
+	glutPassiveMotionFunc(moveMouse);
+	SetCursorPos(windowWidth / 2 + windowPositionX, windowHeight / 2 + windowPositionY);
 }
 
 
