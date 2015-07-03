@@ -8,14 +8,15 @@
 #include "shaderprogram.h"
 #include "cube.h"
 #include "teapot.h"
-
+#include "Model_obj.cpp"
 
 //Macierze
 glm::mat4  matP;//rzutowania
 glm::mat4  matV;//widoku
 glm::mat4  matM;//modelu
 
-
+//Modele
+Model_OBJ dack;
 
 // k¹t horyzontalny (na -Z)
 float horizontalAngle = 3.14f;
@@ -60,6 +61,7 @@ ShaderProgram *shaderProgram; //WskaŸnik na obiekt reprezentuj¹cy program cieniu
 
 //Uchwyty na VAO i bufory wierzcho³ków
 GLuint vao;
+GLuint vao2;
 GLuint bufVertices; //Uchwyt na bufor VBO przechowuj¹cy tablicê wspó³rzêdnych wierzcho³ków
 GLuint bufColors;  //Uchwyt na bufor VBO przechowuj¹cy tablicê kolorów
 GLuint bufNormals; //Uchwyt na bufor VBO przechowuj¹cy tablicê wektorów normalnych
@@ -129,7 +131,7 @@ void drawObject() {
 
 //Procedura rysuj¹ca
 void displayFrame() {
-
+	
 	//Wyczyœæ bufor kolorów i bufor g³êbokoœci
 	glClearColor(0,0,0,1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -158,6 +160,7 @@ void displayFrame() {
 	matM=glm::rotate(matM,angle_y,glm::vec3(0,1,0)); 
 	
 	//Narysuj obiekt
+	
 	drawObject();
 	
 	//Tylny bufor na przedni
@@ -193,10 +196,8 @@ void assignVBOtoAttribute(char* attributeName, GLuint bufVBO, int variableSize) 
 void setupVAO() {
 	//Wygeneruj uchwyt na VAO i zapisz go do zmiennej globalnej
 	glGenVertexArrays(1,&vao);
-	
 	//Uaktywnij nowo utworzony VAO
 	glBindVertexArray(vao);
-
 	assignVBOtoAttribute("vertex",bufVertices,4); //"vertex" odnosi siê do deklaracji "in vec4 vertex;" w vertex shaderze
 	assignVBOtoAttribute("color",bufColors,4); //"color" odnosi siê do deklaracji "in vec4 color;" w vertex shaderze
 	assignVBOtoAttribute("normal",bufNormals,4); //"normal" odnosi siê do deklaracji "in vec4 normal;" w vertex shaderze
@@ -419,6 +420,7 @@ int main(int argc, char** argv) {
 	initGLEW();
 	initOpenGL();
 	
+	dack.Load("dack.obj");
 	glutMainLoop();
 	
 	freeVAO();
