@@ -43,7 +43,7 @@ glm::vec3 right = glm::vec3(
 	);
 
 //Ustawienia okna i rzutowania
-int windowPositionX = 100;
+int windowPositionX = 500;
 int windowPositionY = 100;
 int windowWidth = 900;
 int windowHeight = 600;
@@ -190,10 +190,10 @@ GLuint makeBuffer(void *data, int vertexCount, int vertexSize) {
 
 //Procedura tworz¹ca bufory VBO zawieraj¹ce dane z tablic opisuj¹cych rysowany obiekt.
 void setupVBO() {
-	vertices2 = dack.vertexBuffer;
+	vertices2 = dack.Faces_Triangles;
 	normals2 = dack.normals;
-	vertexCount2 = dack.TotalConnectedPoints;
-
+	vertexCount2 = dack.TotalConnectedTriangles;
+	cout << vertexCount2 << " " << vertexCount << endl;
 	bufVertices = makeBuffer(vertices, vertexCount, sizeof(float) * 4); //Wspó³rzêdne wierzcho³ków
 	bufColors = makeBuffer(colors, vertexCount, sizeof(float) * 4);//Kolory wierzcho³ków
 	bufNormals = makeBuffer(normals, vertexCount, sizeof(float) * 4);//Wektory normalne wierzcho³ków
@@ -445,11 +445,12 @@ void freeVAO() {
 
 
 int main(int argc, char** argv) {
+	dack.Load("dack.obj");
 	initGLUT(&argc, argv);
 	initGLEW();
 	initOpenGL();
 
-	dack.Load("dack.obj");
+	
 
 	glutMainLoop();
 

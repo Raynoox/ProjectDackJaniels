@@ -187,6 +187,7 @@ int Model_OBJ::Load(char* filename)
 	{
 		cout << "Unable to open file";
 	}
+	cout << TotalConnectedTriangles << endl;
 	return 0;
 }
 
