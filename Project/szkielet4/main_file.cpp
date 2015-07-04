@@ -114,7 +114,7 @@ void drawObject() {
 	glUniformMatrix4fv(shaderProgram->getUniformLocation("V"), 1, false, glm::value_ptr(matV));
 	glUniformMatrix4fv(shaderProgram->getUniformLocation("M"), 1, false, glm::value_ptr(matM));
 
-	glUniform4f(shaderProgram->getUniformLocation("lightPosition"), 0, 0, 5, 1);
+	glUniform4f(shaderProgram->getUniformLocation("lightPosition"), 10, 0, 10, 1);
 
 	glUniform1i(shaderProgram->getUniformLocation("textureMap0"), 0);
 	glUniform1i(shaderProgram->getUniformLocation("textureMap1"), 1);
@@ -190,9 +190,10 @@ GLuint makeBuffer(void *data, int vertexCount, int vertexSize) {
 
 //Procedura tworz¹ca bufory VBO zawieraj¹ce dane z tablic opisuj¹cych rysowany obiekt.
 void setupVBO() {
-	vertices2 = dack.Faces_Triangles;
+	vertices2 = dack.vertexBuffer;
 	normals2 = dack.normals;
-	vertexCount2 = dack.TotalConnectedTriangles;
+	colors2 = dack.colors;
+	vertexCount2 = dack.TotalConnectedPoints/4;
 	cout << vertexCount2 << " " << vertexCount << endl;
 	bufVertices = makeBuffer(vertices, vertexCount, sizeof(float) * 4); //Wspó³rzêdne wierzcho³ków
 	bufColors = makeBuffer(colors, vertexCount, sizeof(float) * 4);//Kolory wierzcho³ków

@@ -46,15 +46,16 @@ public:
 	void Model_OBJ::Release();				// Release the model
 
 	float* normals;							// Stores the normals
+	float* colors;							// przechowuje kolory :D
 	float* Faces_Triangles;					// Stores the triangles
 	float* vertexBuffer;					// Stores the points which make the object
 	long TotalConnectedPoints;				// Stores the total number of connected verteces
 	long TotalConnectedTriangles;			// Stores the total number of connected triangles
-
+	long TotalConnectedNormals;
 };
 
 
-#define POINTS_PER_VERTEX 3
+#define POINTS_PER_VERTEX 4
 #define TOTAL_FLOATS_IN_TRIANGLE 9
 using namespace std;
 
@@ -104,10 +105,10 @@ int Model_OBJ::Load(char* filename)
 		long fileSize = objFile.tellg();									// get file size
 		objFile.seekg(0, ios::beg);										// we'll use this to register memory for our 3d model
 
-		vertexBuffer = (float*)malloc(fileSize);							// Allocate memory for the verteces
+		vertexBuffer = (float*)malloc(fileSize*sizeof(float));							// Allocate memory for the verteces
 		Faces_Triangles = (float*)malloc(fileSize*sizeof(float));			// Allocate memory for the triangles
 		normals = (float*)malloc(fileSize*sizeof(float));					// Allocate memory for the normals
-
+		colors = (float*)malloc(fileSize*sizeof(float));
 		int triangle_index = 0;												// Set triangle index to zero
 		int normal_index = 0;												// Set normal index to zero
 
@@ -125,11 +126,25 @@ int Model_OBJ::Load(char* filename)
 						&vertexBuffer[TotalConnectedPoints],
 						&vertexBuffer[TotalConnectedPoints + 1],
 						&vertexBuffer[TotalConnectedPoints + 2]);
+					vertexBuffer[TotalConnectedPoints + 3] = 1.0f;
+					colors[TotalConnectedPoints] = 1.0f;
+					colors[TotalConnectedPoints + 1] = 0.0f;
+					colors[TotalConnectedPoints + 2] = 0.0f;
+					colors[TotalConnectedPoints + 3] = 1.0f;
 
 					TotalConnectedPoints += POINTS_PER_VERTEX;					// Add 3 to the total connected points
 				}
+				if (!(line.c_str()[1] == 'n'))
+				{
+					sscanf(line.c_str(), "%f %f %f",
+						&normals[TotalConnectedNormals],
+						&normals[TotalConnectedNormals + 1],
+						&normals[TotalConnectedNormals + 2]);
+					normals[TotalConnectedNormals + 3] = 0.0f;
+					TotalConnectedNormals += POINTS_PER_VERTEX;
+				}
 			}
-			if (line.c_str()[0] == 'f')										// The first character is an 'f': on this line is a point stored
+			/*if (line.c_str()[0] == 'f')										// The first character is an 'f': on this line is a point stored
 			{
 				line[0] = ' ';												// Set first character to 0. This will allow us to use sscanf
 
@@ -149,7 +164,7 @@ int Model_OBJ::Load(char* filename)
 				* The vertexBuffer contains all verteces
 				* The triangles will be created using the verteces we read previously
 				*/
-
+			/*
 				int tCounter = 0;
 				for (int i = 0; i < POINTS_PER_VERTEX; i++)
 				{
@@ -162,7 +177,7 @@ int Model_OBJ::Load(char* filename)
 				/*********************************************************************
 				* Calculate all normals, used for lighting
 				*/
-				float coord1[3] = { Faces_Triangles[triangle_index], Faces_Triangles[triangle_index + 1], Faces_Triangles[triangle_index + 2] };
+				/*float coord1[3] = { Faces_Triangles[triangle_index], Faces_Triangles[triangle_index + 1], Faces_Triangles[triangle_index + 2] };
 				float coord2[3] = { Faces_Triangles[triangle_index + 3], Faces_Triangles[triangle_index + 4], Faces_Triangles[triangle_index + 5] };
 				float coord3[3] = { Faces_Triangles[triangle_index + 6], Faces_Triangles[triangle_index + 7], Faces_Triangles[triangle_index + 8] };
 				float *norm = this->calculateNormal(coord1, coord2, coord3);
@@ -179,7 +194,7 @@ int Model_OBJ::Load(char* filename)
 				triangle_index += TOTAL_FLOATS_IN_TRIANGLE;
 				normal_index += TOTAL_FLOATS_IN_TRIANGLE;
 				TotalConnectedTriangles += TOTAL_FLOATS_IN_TRIANGLE;
-			}
+			}*/
 		}
 		objFile.close();														// Close OBJ file
 	}
@@ -187,7 +202,7 @@ int Model_OBJ::Load(char* filename)
 	{
 		cout << "Unable to open file";
 	}
-	cout << TotalConnectedTriangles << endl;
+	cout << TotalConnectedPoints << endl;
 	return 0;
 }
 
@@ -196,6 +211,7 @@ void Model_OBJ::Release()
 	free(this->Faces_Triangles);
 	free(this->normals);
 	free(this->vertexBuffer);
+	free(this->colors);
 }
 
 void Model_OBJ::Draw()

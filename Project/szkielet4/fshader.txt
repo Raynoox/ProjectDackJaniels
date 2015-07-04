@@ -14,7 +14,7 @@ uniform sampler2D textureMap1;
 void main(void) {
 
 	//Parametry modelu oswietlenia - normalnie powinny byc przekazane jako zmienne jednorodne, ale dla uproszczenia sa zakodowane na twardo
-	vec4 La=vec4(0,0,0,0); //Kolor swiatla otoczenia
+	vec4 La=vec4(1,1,1,0); //Kolor swiatla otoczenia
 	vec4 Ma=vec4(0,0,0,0); //Kolor materialu dla swiatla otoczenia
 
 	vec4 Ld=vec4(1,1,1,1); //Kolor swiatla rozpraszanego
@@ -35,4 +35,5 @@ void main(void) {
 	float rv=pow(max(dot(mr,mv),0),shininess);
 	
 	pixelColor=La*Ma+Ld*Md*vec4(nl,nl,nl,1)+Ls*Ms*vec4(rv,rv,rv,0);
+	//pixelColor=interpolatedColor;
 }
