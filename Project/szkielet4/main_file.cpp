@@ -115,6 +115,7 @@ void drawObject() {
 	glUniformMatrix4fv(shaderProgram->getUniformLocation("M"), 1, false, glm::value_ptr(matM));
 
 	glUniform4f(shaderProgram->getUniformLocation("lightPosition"), 10, 0, 10, 1);
+	glUniform4f(shaderProgram->getUniformLocation("lightPosition"), 1000, 1000, 1000, 1);
 
 	glUniform1i(shaderProgram->getUniformLocation("textureMap0"), 0);
 	glUniform1i(shaderProgram->getUniformLocation("textureMap1"), 1);
@@ -446,7 +447,7 @@ void freeVAO() {
 
 
 int main(int argc, char** argv) {
-	dack.Load("dack.obj");
+	dack.Load("dack1.obj");
 	initGLUT(&argc, argv);
 	initGLEW();
 	initOpenGL();
