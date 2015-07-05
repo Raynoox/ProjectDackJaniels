@@ -10,6 +10,7 @@ in vec2 iTexCoord;
 
 uniform sampler2D textureMap0;
 uniform sampler2D textureMap1;
+uniform sampler2D textureMap2;
 
 void main(void) {
 
